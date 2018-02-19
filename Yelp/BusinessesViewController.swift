@@ -8,9 +8,9 @@
 
 import UIKit
 
-class BusinessesViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
+class BusinessesViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, UISearchBarDelegate {
     
-    
+    @IBOutlet weak var searchBar: UISearchBar!
     @IBOutlet weak var tableView: UITableView!
     var businesses: [Business]!
     var filteredData: [Business]!
@@ -22,6 +22,7 @@ class BusinessesViewController: UIViewController, UITableViewDataSource, UITable
         tableView.dataSource = self
         tableView.rowHeight = UITableViewAutomaticDimension
         tableView.estimatedRowHeight = 120
+        searchBar.delegate = self
         
         Business.searchWithTerm(term: "Thai", completion: { (businesses: [Business]?, error: Error?) -> Void in
             
@@ -69,6 +70,15 @@ class BusinessesViewController: UIViewController, UITableViewDataSource, UITable
         cell.business = filteredData[indexPath.row]
         return cell
     }
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        filteredData = searchText.isEmpty ? businesses : businesses.filter { (item: Business) -> Bool in
+            // If dataItem matches the searchText, return true to include it
+            return item.name?.range(of: searchText, options: .caseInsensitive, range: nil, locale: nil) != nil
+        }
+        
+        tableView.reloadData()
+    }
+
     
     /*
      // MARK: - Navigation
